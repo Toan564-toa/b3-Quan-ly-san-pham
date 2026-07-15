@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { addProduct, getProduct } from "../db/Api";
+import { addProduct, deleteProduct, getProduct } from "../db/Api";
 
 const ProductManage = () => {
   const [data, setData] = useState([]);
@@ -8,7 +8,7 @@ const ProductManage = () => {
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [image, setImage] = useState("");
-//   const [add, setAdd] = useState();
+  //   const [add, setAdd] = useState();
 
   useEffect(() => {
     const loadData = async () => {
@@ -20,7 +20,6 @@ const ProductManage = () => {
     loadData();
     // setCate([...new Set(data.map((item) => item.category))]);
   }, []);
-
 
   //     {
   //     "id": 1,
@@ -35,48 +34,109 @@ const ProductManage = () => {
   //     }
   // }
 
-  const handleSubmit = async (e)=> {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // console.log("e: ", e.target.title.value)
 
     const objData = {
-        title: title,
-        image: image,
-        description: description,
-        price: Number(price),
-        category: category
-    }
+      title: title,
+      image: image,
+      description: description,
+      price: Number(price),
+      category: category,
+    };
 
     console.log("objData: ", objData);
-    const request = await addProduct(objData);
-    console.log("request: ", request);
-    setData([...data, request.data])
+    try {
+      const request = await addProduct(objData);
+      // console.log("request: ", request);
+
+      setData([...data, request.data]);
+      alert("Thêm thành công!");
+    } catch (error) {}
     // setAdd(request);
-  }
+    alert("Thêm thất bại!");
+  };
+
+  const delProduct = async (id) => {
+    // console.log("id: ", id);
+    // eslint-disable-next-line no-restricted-globals
+    if (confirm("Bạn có chắc muốn xóa sản phẩm này?")) {
+      try {
+        const request = await deleteProduct(id);
+        console.log("request: ", request);
+        // console.log("id: ", data.filter((item) => item.id !== request.data.id))
+        setData(data.filter((item) => item.id !== request.data.id));
+
+        alert("Xóa thành công!");
+        console.log("data: ", data);
+      } catch (error) {
+        alert("Xóa thất bại!");
+      }
+    }
+  };
 
   return (
     <div className="manager">
       <section>
         <form onSubmit={handleSubmit}>
           <div className="itemForm">
+            <h3>Thêm sản phẩm</h3>
+          </div>
+          <div className="itemForm">
             <label htmlFor="title">Tên sản phẩm: </label>
-            <input type="text" name="" id="title" value={title} onChange={(e) => setTitle(e.target.value)} required/>
+            <input
+              type="text"
+              name=""
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+            />
           </div>
           <div className="itemForm">
             <label htmlFor="image">Hình ảnh: </label>
-            <input type="text" name="" id="image" value={image} onChange={(e) => setImage(e.target.value)} required/>
+            <input
+              type="text"
+              name=""
+              id="image"
+              value={image}
+              onChange={(e) => setImage(e.target.value)}
+              required
+            />
           </div>
           <div className="itemForm">
             <label htmlFor="description">Mô tả: </label>
-            <input type="text" name="" id="description" value={description} onChange={(e) => setDescription(e.target.value)} required/>
+            <input
+              type="text"
+              name=""
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+            />
           </div>
           <div className="itemForm">
             <label htmlFor="price">Giá: </label>
-            <input type="number" name="" id="price" value={price} onChange={(e) => setPrice(e.target.value)} required/>
+            <input
+              type="number"
+              name=""
+              id="price"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              required
+            />
           </div>
           <div className="itemForm">
             <label htmlFor="category">Loại: </label>
-            <input type="text" name="" id="category" value={category} onChange={(e) => setCategory(e.target.value)} required/>
+            <input
+              type="text"
+              name=""
+              id="category"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              required
+            />
           </div>
           <button className="itemForm detail-btn">Xác nhận</button>
         </form>
@@ -115,9 +175,20 @@ const ProductManage = () => {
                   <td className="col4">{item.description}</td>
                   <td className="col5">{item.category}</td>
                   <td className="col6">${item.price}</td>
-                  <td className="col7">{item?.rating?.rate >= 0? item.rating.rate : 0}</td>
-                  <td className="col8">{item?.rating?.count >= 0 ? item.rating.count : 0}</td>
-                  <td className="col9">{item.id}</td>
+                  <td className="col7">
+                    {item?.rating?.rate >= 0 ? item.rating.rate : 0}
+                  </td>
+                  <td className="col8">
+                    {item?.rating?.count >= 0 ? item.rating.count : 0}
+                  </td>
+                  <td className="col9">
+                    <button
+                      className="detail-btn"
+                      onClick={() => delProduct(item.id)}
+                    >
+                      Xác nhận
+                    </button>
+                  </td>
                 </tr>
               ))}
             </>
